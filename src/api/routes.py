@@ -70,27 +70,31 @@ def create_order():
         return jsonify({"msg": f"Error: {str(e)}"}), 500
     
 
-@api.route('/orders', methods=['GET'])
-def get_orders():
-    orders = db.session.query(Order, User).join(User).all()
-
-    result = [
+# Listar todos los pedidos con el nombre del usuario
+@api.route("/orders", methods=["GET"])
+def get_all_orders():
+    orders = Order.query.join(User).all()
+    return jsonify([
         {
             "id": order.id,
             "product_name": order.product_name,
             "amount": order.amount,
-            "user": user.name
-        }
-        for order, user in orders
-    ]
+            "user_name": order.user.name
+        } for order in orders
+    ]), 200
 
-    return jsonify(result), 200
-
-@api.route('/users/<int:user_id>/orders', methods=['GET'])
-def get_user_orders(user_id):
+@api.route("/users/<int:user_id>/orders", methods=["GET"])
+def get_orders_by_user(user_id):
     orders = Order.query.filter_by(user_id=user_id).all()
 
     if not orders:
-        return jsonify({"msg": "No se encontraron pedidos para este usuario"}), 404
+        return jsonify({"msg": "No hay pedidos para este usuario"}), 404
 
-    return jsonify([order.serialize() for order in orders]), 200
+    return jsonify([
+        {
+            "id": order.id,
+            "product_name": order.product_name,
+            "amount": order.amount,
+            "created_at": order.created_at.isoformat()
+        } for order in orders
+    ]), 200

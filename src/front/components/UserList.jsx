@@ -31,7 +31,7 @@ export const UserList = () => {
     }, []);
 
     function OrdersOnClick(theID){
-        navigate("/UserOrder/:"+ theID)
+        navigate("/users/"+ theID+"/orders")
     }
 
     return (
