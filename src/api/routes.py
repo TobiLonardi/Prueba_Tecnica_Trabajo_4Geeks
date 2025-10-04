@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User,Order
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -48,3 +48,49 @@ def create_user():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
+@api.route('/orders', methods=['POST'])
+def create_order():
+    data = request.json
+    product_name = data.get("product_name")
+    amount = data.get("amount")
+    user_id = data.get("user_id")
+
+    if not product_name or not amount or not user_id:
+        return jsonify({"msg": "Todos los campos son obligatorios"}), 400
+
+    order = Order(product_name=product_name, amount=amount, user_id=user_id)
+    db.session.add(order)
+
+    try:
+        db.session.commit()
+        return jsonify(order.serialize()), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"Error: {str(e)}"}), 500
+    
+
+@api.route('/orders', methods=['GET'])
+def get_orders():
+    orders = db.session.query(Order, User).join(User).all()
+
+    result = [
+        {
+            "id": order.id,
+            "product_name": order.product_name,
+            "amount": order.amount,
+            "user": user.name
+        }
+        for order, user in orders
+    ]
+
+    return jsonify(result), 200
+
+@api.route('/users/<int:user_id>/orders', methods=['GET'])
+def get_user_orders(user_id):
+    orders = Order.query.filter_by(user_id=user_id).all()
+
+    if not orders:
+        return jsonify({"msg": "No se encontraron pedidos para este usuario"}), 404
+
+    return jsonify([order.serialize() for order in orders]), 200
