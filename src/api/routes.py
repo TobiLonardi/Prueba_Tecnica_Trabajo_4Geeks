@@ -67,6 +67,9 @@ def create_order():
 
     if not product_name or not amount or not user_id:
         return jsonify({"msg": "Todos los campos son obligatorios"}), 400
+    
+    if int(amount)<=0:
+        return jsonify({"msg": "la cantidad debe ser al menos 1"}),401
 
     order = Order(product_name=product_name, amount=amount, user_id=user_id)
     db.session.add(order)
