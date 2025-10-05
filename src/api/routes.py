@@ -34,6 +34,20 @@ def get_users():
     users = User.query.all() 
     return jsonify([user.serialize() for user in users]), 200
 
+@api.route("/users/<int:id>",methods=["GET"])
+def get_user(id):
+    user=User.query.filter_by(id=id).first()
+    if not user:
+        return jsonify({"msg":"no existe ese usuario"}),400
+
+    return jsonify(
+    {
+        "id": user.id,
+        "username": user.name,
+        "email": user.email,
+    }
+    ), 200
+
 @api.route("/users", methods=["POST"])
 def create_user():
     data = request.json
@@ -92,7 +106,8 @@ def get_all_orders():
             "id": order.id,
             "product_name": order.product_name,
             "amount": order.amount,
-            "user_name": order.user.name
+            "user_name": order.user.name,
+            "created_at":order.created_at
         } for order in orders
     ]), 200
 

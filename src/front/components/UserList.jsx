@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react"
-import rigoImageUrl from "../assets/img/rigo-baby.jpg";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
 import { Link, useNavigate, Navigate } from "react-router-dom"
-import { string } from "prop-types";
 
 
 
@@ -30,8 +27,8 @@ export const UserList = () => {
         fetchUsers();
     }, []);
 
-    function OrdersOnClick(theID){
-        navigate("/users/"+ theID+"/orders")
+    function OrdersOnClick(theID) {
+        navigate("/users/" + theID + "/orders")
     }
 
     return (
@@ -40,22 +37,38 @@ export const UserList = () => {
                 <div className="card-header bg-primary text-white text-center">
                     <h2 className="m-0">Listado de Usuarios</h2>
                 </div>
+
                 <div className="card-body">
-                    <ul className="list-group list-group-flush">
-                        {users.map(user => (
-                            <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center w-100">
-                                <div>
-                                    <strong>{user.name}</strong>
-                                    <span className="text-muted"> - {user.email}</span>
-
-                                </div>
-                                <i className="bi bi-person-circle text-primary fs-4"></i>
-                                    <button type="button" className="btn btn-success" onClick={()=>OrdersOnClick(user.id)}>Pedidos</button>
-
-                            </li>
-                        ))}
-                    </ul>
+                    <table className="table table-striped table-hover">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {users.map(user => (
+                                <tr key={user.id}>
+                                    <td>
+                                        <strong>{user.name}</strong>
+                                    </td>
+                                    <td>{user.email}</td>
+                                    <td className="d-flex justify-content-end">
+                                        <button
+                                            type="button"
+                                            className="btn btn-success"
+                                            onClick={() => OrdersOnClick(user.id)}
+                                        >
+                                            Detalles
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
+
                 <div className="card-footer text-center">
                     <Link to="/register" className="btn btn-primary">
                         Registrarme

@@ -1,8 +1,7 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
 
 
-export const Navbar = () => {
+export const Searcher = () => {
 
 	const [query, setQuery] = useState("");
 	const [results, setResults] = useState({ users: [], orders: [] });

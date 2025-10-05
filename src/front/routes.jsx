@@ -11,6 +11,7 @@ import { Single } from "./pages/Single";
 import { Demo } from "./pages/Demo";
 import {Register} from "./pages/Register"
 import { UserOrder } from "./pages/UserOrder";
+import {AllOrders} from "./pages/AllOrders"
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -29,6 +30,9 @@ export const router = createBrowserRouter(
         <Route path="/demo" element={<Demo />} />
         <Route path= "/register" element={<Register />} />
         <Route path="/users/:theId/orders" element={<UserOrder />} />
+        <Route path= "/allOrders" element={<AllOrders />} />
+
+
 
       </Route>
     )

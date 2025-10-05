@@ -11,11 +11,18 @@ export const UserOrder = () => {
     amount: "",
     user_id: theId
   });
+  const [user,SetUser] = useState({
+    Id:"",
+    username:"",
+    email:""
+  })
+  
 
   const url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     fetchOrders();
+    fetchUser();
   }, [theId]);
 
   const fetchOrders = async () => {
@@ -33,6 +40,22 @@ export const UserOrder = () => {
       setLoading(false);
     }
   };
+
+  const fetchUser = async()=>{
+    try {
+      const response = await fetch(`${url}/api/users/${theId}`);
+      if (response.ok) {
+        const data = await response.json();
+        SetUser(data);
+      } else {
+        console.error("Error al cargar usuario");
+      }
+    } catch (err) {
+      console.error("Error de conexión:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -65,12 +88,16 @@ export const UserOrder = () => {
     }
   };
 
-  // 🔹 Renderizado
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Pedidos del Usuario #{theId}</h2>
 
-      {/* FORMULARIO */}
+      <h2 className="text-center mb-4">Pedidos del Usuario #{theId}</h2>
+      <div className="card p-4 mb-5 shadow">
+        <h4>Informacion del usuario</h4>
+        <p>Email de usuario: {user["email"]}</p>
+        <p>Username del usuario: {user["username"]}</p>
+      </div>
+
       <div className="card p-4 mb-5 shadow">
         <h4>Crear un Pedido</h4>
         <form onSubmit={handleSubmit}>
