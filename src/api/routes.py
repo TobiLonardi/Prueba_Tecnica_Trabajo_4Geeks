@@ -5,12 +5,18 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User,Order
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+import re
+
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
 
+
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -34,6 +40,9 @@ def create_user():
 
     if not email or not name:
         return jsonify({"message": "Email y username son requeridos"}), 400
+    
+    if not is_valid_email(email):
+        return jsonify({"message": "Formato de email inválido"}), 400
 
     existing_user = User.query.filter_by(email=email).first()
     if existing_user:
@@ -70,7 +79,6 @@ def create_order():
         return jsonify({"msg": f"Error: {str(e)}"}), 500
     
 
-# Listar todos los pedidos con el nombre del usuario
 @api.route("/orders", methods=["GET"])
 def get_all_orders():
     orders = Order.query.join(User).all()
