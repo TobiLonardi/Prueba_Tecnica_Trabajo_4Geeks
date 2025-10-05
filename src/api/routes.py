@@ -6,6 +6,8 @@ from api.models import db, User,Order
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 import re
+from sqlalchemy import or_
+
 
 
 api = Blueprint('api', __name__)
@@ -109,3 +111,36 @@ def get_orders_by_user(user_id):
             "created_at": order.created_at.isoformat()
         } for order in orders
     ]), 200
+
+@api.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("q", "").strip()
+
+    if not query:
+        return jsonify({"message": "Debes proporcionar un término de búsqueda"}), 400
+
+    # Buscar usuarios por nombre o email
+    users = User.query.filter(
+        or_(
+            User.name.ilike(f"%{query}%"),
+            User.email.ilike(f"%{query}%")
+        )
+    ).all()
+
+    # Buscar pedidos por nombre del producto
+    orders = Order.query.filter(
+        Order.product_name.ilike(f"%{query}%")
+    ).all()
+
+    return jsonify({
+        "users": [user.serialize() for user in users],
+        "orders": [
+            {
+                "id": order.id,
+                "product_name": order.product_name,
+                "amount": order.amount,
+                "user": order.user.serialize()
+            }
+            for order in orders
+        ]
+    }), 200
